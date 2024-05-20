@@ -94,26 +94,13 @@ export const authOptions: NextAuthOptions = {
           const api = await ApiPromise.create({ provider: wsProvider });
           await api.isReady;
 
-          if (credentials?.address) {
-            const ksmAddress = encodeAddress(credentials.address, 2);
-            // highlight-start
-            const accountInfo = await api.query.system.account(ksmAddress);
+          return {
+              id: credentials.address,
+              name: credentials.name,
+              freeBalance: accountInfo.data.free,
+              ksmAddress,
+            };
 
-            if (accountInfo.data.free.gt(new BN(1_000_000_000_000))) {
-              // if the user has a free balance > 1 KSM, we let them in
-              return {
-                id: credentials.address,
-                name: credentials.name,
-                freeBalance: accountInfo.data.free,
-                ksmAddress,
-              };
-            } else {
-              return Promise.reject(new Error('🚫 The gate is closed for you'));
-            }
-            // highlight-end
-          }
-
-          return Promise.reject(new Error('🚫 API Error'));
         } catch (e) {
           return null;
         }
