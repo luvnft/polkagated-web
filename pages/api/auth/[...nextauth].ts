@@ -97,7 +97,7 @@ export const authOptions: NextAuthOptions = {
           return {
               id: credentials.address,
               name: credentials.name,
-              freeBalance: accountInfo.data.free,
+              freeBalance: "",
               ksmAddress,
             };
 
