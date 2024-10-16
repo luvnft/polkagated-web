@@ -12,7 +12,7 @@ export const accountValueTemplate = (option: any, props: any) => {
     return (
       <div className={styles.accountOption}>
         <div>
-          <Identicon value={option?.address} size={32} theme="polkadot" />
+          <Identicon value={option?.address} size={32} theme="substrate" />
           {option?.meta?.name}
         </div>
       </div>
@@ -26,7 +26,7 @@ export const accountOptionTemplate = (option: any) => {
   return (
     <div className={styles.accountOption}>
       <div>
-        <Identicon value={option?.address} size={32} theme="polkadot" />
+        <Identicon value={option?.address} size={32} theme="substrate" />
         {option?.meta?.name}
       </div>
     </div>

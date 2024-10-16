@@ -89,7 +89,7 @@ export const authOptions: NextAuthOptions = {
 
           // verify the account has the defined token
           const wsProvider = new WsProvider(
-            process.env.RPC_ENDPOINT ?? 'wss://kusama-rpc.dwellir.com',
+            process.env.RPC_ENDPOINT ?? 'ws://192.168.1.3:63007',
           );
           const api = await ApiPromise.create({ provider: wsProvider });
           await api.isReady;
@@ -97,8 +97,8 @@ export const authOptions: NextAuthOptions = {
           return {
               id: credentials.address,
               name: credentials.name,
-              freeBalance: "",
-              ksmAddress,
+              freeBalance: api.createType('Balance', 0),
+              ksmAddress: encodeAddress(credentials.address, 2),
             };
 
         } catch (e) {

@@ -26,7 +26,8 @@ export default function Admin( { freeBalance } : { freeBalance : BN } ) : JSX.El
   }
 
   // format the big number to a human readable format
-  const ksmBalance = formatBalance( freeBalance, { decimals: 12, withSi: true, withUnit: 'KSM' } )
+  // const ksmBalance = formatBalance( freeBalance, { decimals: 12, withSi: true, withUnit: 'KSM' } )
+  const ksmBalance = formatBalance( freeBalance, { decimals: 9, withSi: true, withUnit: 'XX' } )
   
   return (
     <main className={ styles.protected }>

@@ -5,10 +5,16 @@ import AccountSelect from './account-select';
 
 import { useRouter } from 'next/router';
 
+// AA
+import { stringToHex, stringToU8a, u8aToHex } from "@polkadot/util";
+// import { wrapBytes } from '@polkadot/extension-dapp';
+import { signatureVerify } from '@polkadot/util-crypto';
+
 import styles from '@/styles/Home.module.css';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import { usePolkadotExtensionWithContext } from '@/context/polkadotExtensionContext';
+import { wrap } from 'module';
 const inter = Inter({ subsets: ['latin'] });
 
 export default function LoginButton() {
@@ -24,25 +30,35 @@ export default function LoginButton() {
       setIsLoading(true);
       let signature = '';
       const message = {
-        statement: 'Sign in with polkadot extension to the example tokengated example dApp',
+        statement: 'Signin',
         uri: window.location.origin,
         version: '1',
         nonce: await getCsrfToken(),
       };
-
+      // const msg = wrapBytes(stringToHex(JSON.stringify(message)));
+      
       const signRaw = injector?.signer?.signRaw;
 
       if (!!signRaw && !!actingAccount) {
         // after making sure that signRaw is defined
-        // we can use it to sign our message
+        // we can use it to sign our message        
         const data = await signRaw({
           address: actingAccount.address,
           data: JSON.stringify(message),
-          type: 'bytes',
+          type: 'bytes'
         });
-
+        // print data to console
+        // console.log(data);
+        // set the signature to the data.signature
         signature = data.signature;
+        console.log(data.signature);
+        // signatureVerify(JSON.stringify(message), signature, actingAccount.address);
+        const { isValid } = signatureVerify(JSON.stringify(message), signature, actingAccount.address);
+        console.log(`signature ${data.signature} is ${isValid ? 'valid' : 'invalid'}`);
       }
+
+      // print message to console
+      console.log(JSON.stringify(message));
 
       // will return a promise https://next-auth.js.org/getting-started/client#using-the-redirect-false-option
       const result = await signIn('credentials', {
@@ -53,13 +69,14 @@ export default function LoginButton() {
         signature,
         address: actingAccount?.address,
       });
+     
 
       // take the user to the protected page if they are allowed
       if (result?.url) {
         router.push('/protected-api');
       }
 
-      setError(result?.error);
+      setError(result?.error ?? undefined);
       setIsLoading(false);
     } catch (error) {
       setError('Cancelled Signature');

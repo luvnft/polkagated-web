@@ -42,7 +42,8 @@ export default function ProtectedPage() {
   }
 
   // format the big number to a human readable format
-  const ksmBalance = formatBalance( session.freeBalance, { decimals: 12, withSi: true, withUnit: 'KSM' } )
+  // const ksmBalance = formatBalance( session.freeBalance, { decimals: 12, withSi: true, withUnit: 'KSM' } )
+  const ksmBalance = formatBalance( session.freeBalance, { decimals: 9, withSi: true, withUnit: 'XX' } )
 
   // If session exists, display content
   return (
