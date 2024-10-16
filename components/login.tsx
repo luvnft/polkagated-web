@@ -6,8 +6,6 @@ import AccountSelect from './account-select';
 import { useRouter } from 'next/router';
 
 // AA
-import { stringToHex, stringToU8a, u8aToHex } from "@polkadot/util";
-// import { wrapBytes } from '@polkadot/extension-dapp';
 import { signatureVerify } from '@polkadot/util-crypto';
 
 import styles from '@/styles/Home.module.css';

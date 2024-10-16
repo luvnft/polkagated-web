@@ -71,5 +71,7 @@ JSON Web Token {
 
 The FAQs say [it's normal to see another address](https://polkadot.js.org/docs/keyring/FAQ#my-pair-address-does-not-match-with-my-chain), but balance look up should work and it doesn't because my wallet balance is > 0 XX.
 
+`encodeAddress(session.address, 55)` is one correction that needed to be made, and the proper encoding used to get the correct wallet address from xx Network printed out in console log. But its balance is still wrong (i.e. not queried). For demo purposes I hard-coded it into JS on one of the protected pages.
 
+ 
 

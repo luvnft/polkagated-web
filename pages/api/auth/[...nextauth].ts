@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { signatureVerify } from '@polkadot/util-crypto';
-import { encodeAddress } from '@polkadot/keyring';
+import { encodeAddress, Keyring } from '@polkadot/keyring';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { BN } from '@polkadot/util';
 
@@ -87,18 +87,26 @@ export const authOptions: NextAuthOptions = {
             return Promise.reject(new Error('🚫 Invalid Signature'));
           }
 
-          // verify the account has the defined token
+	  // AA: specify xx Network
+	  const keyring = new Keyring({ type: 'sr25519', ss58Format: 55 });
+
+	  // verify the account has the defined token
           const wsProvider = new WsProvider(
             process.env.RPC_ENDPOINT ?? 'ws://192.168.1.3:63007',
           );
           const api = await ApiPromise.create({ provider: wsProvider });
           await api.isReady;
 
+          // AA: encode wallet address for ss58Format 55
+          const ksmAddress = encodeAddress(credentials.address, 55);
+          // AA: write ksmAddress for xx Network to console
+          console.log('wallet address on xx Network: ', ksmAddress);
+
           return {
               id: credentials.address,
               name: credentials.name,
-              freeBalance: api.createType('Balance', 0),
-              ksmAddress: encodeAddress(credentials.address, 2),
+              freeBalance: api.createType('Balance', 0),  
+              ksmAddress: ksmAddress,
             };
 
         } catch (e) {
@@ -126,7 +134,7 @@ export const authOptions: NextAuthOptions = {
 
       session.address = token.sub;
       if (session.address) {
-        session.ksmAddress = encodeAddress(session.address, 2);
+        session.ksmAddress = encodeAddress(session.address, 55);
       }
 
       // as we already queried it, we can add whatever token to the session,
