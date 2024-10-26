@@ -45,10 +45,9 @@ export default function ProtectedPage() {
   }
 
   // format the big number to a human readable format
-  // const ksmBalance = formatBalance( freeBalance, { decimals: 12, withSi: true, withUnit: 'KSM' } )
-  // AA: hard-coded 2.00 xx
-  const freeBalance = new BN(2000000000);
-  const ksmBalance = formatBalance(freeBalance, {
+  // const ksmBalance = formatBalance( session.freeBalance, { decimals: 12, withSi: true, withUnit: 'KSM' } )
+  // AA: xx uses 9 decimals
+  const ksmBalance = formatBalance(session.freeBalance, {
     decimals: 9,
     withSi: true,
     withUnit: 'XX',

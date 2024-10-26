@@ -1,26 +1,75 @@
-# Polkadot Tokengated Tutorial with next-auth
+## README for xx Network
 
-This is a the demo repo for a tokengated website with polkadot js API and next.js. It allows you to connect your wallet and sign a message. Then the server will check the via the polkadot js api if the signing wallet passes an arbitrary token check. 
+(See [KSM_README.md](./KSM_README.md) for upstream README document.)
 
-A tutorial that explains how it works will be published soon on [polkadot.study](https://polkadot.study)
+Thank you to [the original author](https://polkadot.study/tutorials/tokengated-polkadot-next-js/intro) and the guy who [forked it](https://github.com/yk909/polkadot-js-tokengated-website/) to apply some fixes (verify/compare if you plan to use in production, of course).
 
-## Run the Project Locally
+This sort of works now and I'm sharing in the hope someone will use it for xx Network or other Substrate projects/chains for which the upstream forks don't provide instructions. 
 
-First copy the .env.local.example to .env.local
+## How to run
 
-First, run the development server:
+Install Polkadot{.js} extension, create xx Network wallet, fund it with some amount of xx coins (1.01, for example) and set it to work on `xx Network`.
 
-```bash
+Download this repo, create `.env.local` in root directory, and run:
+
+```sh
+cp .env.local.example .env.local
+vim .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+My .env.local for non-production use:
 
-## More
+```raw
+NEXTAUTH_SECRET=123123123
+NEXTAUTH_URL=http://localhost:3000
+RPC_ENDPOINT=ws://192.168.1.30:63007
+```
 
-- The project was funded by the Kusama Treasury in Referendum 102 (within polkadot.study proposal)
-- This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Go to http://localhost:3000 in the browser in which you installed Polkadot{.js} and connect the extension to http://localhost:3000 (see [xx_polkadot_extension.png](./xx_polkadot_extension.png)), generate an address and make it restricted for use on xx Network (I hoped this would ensure balance will be looked up correctly, but it was not).
+
+With that, I can login (see [xx_screenshot.png](./xx_screenshot.png) and balance of xx coins is correctly shown. We could probably check tokens (issued on xx Network), but I haven't looked into that yet.
+
+(Note that, if you go to https://wallet.xx.network, Polkadot{.js} can let you add the wallet from the browser extension and show it in xx Network Wallet. Neat!)
+
+`npm run build` builds okay, but has warnings about multiple versions of some package, etc. I don't know JS well enough to fix this quickly.
+
+## What modified and why
+
+`.env.local` and `pages/api/auth/[...nextauth].js` line 92 there's a fall back to public RPC endpoint, but I modified that one to local as well. 
+
+In `components/login.tsx` I added some functions for debugging, and logging to console.
+
+In `pages/protected-api.tsx` and `pages/protected.tsx` ("static" protected page), changed KSM to XX and changed the number of decimals to 9 from 12:
+```sh
+const ksmBalance = formatBalance( session.freeBalance, { decimals: 9, withSi: true, withUnit: 'XX' } )
+```
+All modified pages from yk909's fork (you can see in Commits):
+
+```sh
+modified:   components/account-select.tsx
+modified:   components/login.tsx
+modified:   package-lock.json
+modified:   package.json
+modified:   pages/api/auth/[...nextauth].ts
+modified:   pages/protected-api.tsx
+modified:   pages/protected.tsx
+```
+
+## Known issues
+
+Internally, the xx wallet address is shown in generic Polkadot format, which is fine - the same private key could be used with a number of Substrate chain addresses.
+
+```raw
+token {
+  name: '123123123',
+  sub: '5GxeeFALkRvjnNgkiMjiP6q2GGnZ1ZmFyjCusHG4VoezqZSN',
+  freeBalance: '0x000000000000000000000000b14a8cbc',
+  iat: 1729956938,
+  exp: 1732548938,
+  jti: '3252212b-0fb2-4a82-88d0-3ceaf5886aa1'
+}
+```
+
+The FAQs say [it's normal to see another address](https://polkadot.js.org/docs/keyring/FAQ#my-pair-address-does-not-match-with-my-chain).
+

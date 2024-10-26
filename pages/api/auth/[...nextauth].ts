@@ -63,6 +63,8 @@ export const authOptions: NextAuthOptions = {
         }
         try {
           const message = JSON.parse(credentials.message);
+          // AA: specify xx Network
+          const keyring = new Keyring({ type: 'sr25519', ss58Format: 55 });
 
           //verify the message is from the same uri
           if (message.uri !== process.env.NEXTAUTH_URL) {
@@ -87,27 +89,36 @@ export const authOptions: NextAuthOptions = {
             return Promise.reject(new Error('🚫 Invalid Signature'));
           }
 
-	  // AA: specify xx Network
-	  const keyring = new Keyring({ type: 'sr25519', ss58Format: 55 });
-
-	  // verify the account has the defined token
-          const wsProvider = new WsProvider(
-            process.env.RPC_ENDPOINT ?? 'ws://192.168.1.3:63007',
-          );
+          // verify the account has the defined token
+          const wsProvider = new WsProvider(process.env.RPC_ENDPOINT ?? 'ws://192.168.1.3:63007');
           const api = await ApiPromise.create({ provider: wsProvider });
           await api.isReady;
 
+          if (credentials?.address) {          
           // AA: encode wallet address for ss58Format 55
           const ksmAddress = encodeAddress(credentials.address, 55);
+          const accountInfo = await api.query.system.account(ksmAddress);
+          const balance = accountInfo.data.free.add(accountInfo.data.reserved);
           // AA: write ksmAddress for xx Network to console
           console.log('wallet address on xx Network: ', ksmAddress);
+          console.log('wallet balance on xx Network: ', balance.toString());          
+            if (accountInfo.data.free.gt(new BN(1_000_000_000))) {
+              // if the user has a free balance > 1 XX, we let them in
+              return {
+                id: credentials.address,
+                name: credentials.name,
+                freeBalance: accountInfo.data.free,
+                ksmAddress,
+              };
+            } else {
+              return Promise.reject(new Error('🚫 The gate is closed for you'));
+            }
+            // highlight-end
+          };
 
-          return {
-              id: credentials.address,
-              name: credentials.name,
-              freeBalance: api.createType('Balance', 0),  
-              ksmAddress: ksmAddress,
-            };
+          return Promise.reject(new Error('🚫 API Error'));
+
+
 
         } catch (e) {
           return null;

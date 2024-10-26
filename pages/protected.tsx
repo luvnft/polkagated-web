@@ -31,7 +31,7 @@ export default function Admin({ freeBalance }: { freeBalance: BN }): JSX.Element
 
   // format the big number to a human readable format
   // const ksmBalance = formatBalance( freeBalance, { decimals: 12, withSi: true, withUnit: 'KSM' } )
-  // AA: freeBalance obtained in L11
+  // AA: freeBalance on XX Network has 9 decimals
   const ksmBalance = formatBalance(freeBalance, {
     decimals: 9,
     withSi: true,
