@@ -28,7 +28,7 @@ RPC_ENDPOINT=ws://192.168.1.30:63007
 
 Go to http://localhost:3000 in the browser in which you installed Polkadot{.js} and connect the extension to http://localhost:3000 (see [xx_polkadot_extension.png](./xx_polkadot_extension.png)), generate an address and make it restricted for use on xx Network (I hoped this would ensure balance will be looked up correctly, but it was not).
 
-With that, I can login (see [xx_screenshot.png](./xx_screenshot.png) and balance of xx coins is correctly shown. We could probably check tokens (issued on xx Network), but I haven't looked into that yet.
+With that, I can login (see [xx_screenshot.png](./xx_screenshot.png) and balance of xx coins is correctly shown (since v1.1). We could probably check for assets/tokens issued on xx Network as well, but I haven't looked into that yet.
 
 (Note that, if you go to https://wallet.xx.network, Polkadot{.js} can let you add the wallet from the browser extension and show it in xx Network Wallet. Neat!)
 
