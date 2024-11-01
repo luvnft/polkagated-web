@@ -2,6 +2,14 @@
 
 (See [KSM_README.md](./KSM_README.md) for upstream README document.)
 
+What it is:
+- Make access to your site or "gated" part of your site possible only to users with a certain amount of xx coins in their Polkadot{.js} (not .{js} - I made a typo in the screenshot) wallet
+- You an also read wallet name - I have it `123123123` in the screenshot, but it'd normally be "Joe Mc Coin" or something more useful
+- You can set that balance to any amount (10, 100, 100,000 XX) or mandate different balances for different paths on your Web site
+- Works with static and dynamic Web pages
+
+![Token-gated xx coin site](xx_screenshot.png)
+
 Thank you to [the original author](https://polkadot.study/tutorials/tokengated-polkadot-next-js/intro) and the guy who [forked it](https://github.com/yk909/polkadot-js-tokengated-website/) to apply some fixes (verify/compare if you plan to use in production, of course).
 
 This sort of works now and I'm sharing in the hope someone will use it for xx Network or other Substrate projects/chains for which the upstream forks don't provide instructions. 
@@ -9,6 +17,8 @@ This sort of works now and I'm sharing in the hope someone will use it for xx Ne
 ## How to run
 
 Install Polkadot{.js} extension, create xx Network wallet, fund it with some amount of xx coins (1.01, for example) and set it to work on `xx Network`.
+
+![xx_polkadot_extension.png](./xx_polkadot_extension.png)
 
 Download this repo, create `.env.local` in root directory, and run:
 
@@ -26,7 +36,7 @@ NEXTAUTH_URL=http://localhost:3000
 RPC_ENDPOINT=ws://192.168.1.30:63007
 ```
 
-Go to http://localhost:3000 in the browser in which you installed Polkadot{.js} and connect the extension to http://localhost:3000 (see [xx_polkadot_extension.png](./xx_polkadot_extension.png)), generate an address and make it restricted for use on xx Network (I hoped this would ensure balance will be looked up correctly, but it was not).
+Go to http://localhost:3000 in the browser in which you installed Polkadot{.js} and connect the extension to http://localhost:3000, generate an address and make it restricted for use on xx Network (I hoped this would ensure balance will be looked up correctly, but it was not).
 
 With that, I can login (see [xx_screenshot.png](./xx_screenshot.png) and balance of xx coins is correctly shown (since v1.1). We could probably check for assets/tokens issued on xx Network as well, but I haven't looked into that yet.
 
@@ -58,6 +68,8 @@ modified:   pages/protected.tsx
 
 ## Known issues
 
+### Address format
+
 Internally, the xx wallet address is shown in generic Polkadot format, which is fine - the same private key could be used with a number of Substrate chain addresses.
 
 ```raw
@@ -73,3 +85,10 @@ token {
 
 The FAQs say [it's normal to see another address](https://polkadot.js.org/docs/keyring/FAQ#my-pair-address-does-not-match-with-my-chain).
 
+You can configure the wallet to default to xx Network, by the way (see the screenshot), to avoid that.
+
+### Token-gating doesn't work for NFT ("asset")
+
+That would need additional development, as wallet (address) balances is different from NFT (asset) lookup where one not only looks up free balance for each NFT, but NFT names, amounts, units, and other metadata from a different Polkadot pallet.
+
+I looked briefly and it seemed much more complex than wallet balance.
