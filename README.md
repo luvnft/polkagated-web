@@ -1,3 +1,12 @@
+- [README for xx Network](#readme-for-xx-network)
+- [How to run](#how-to-run)
+- [Use cases](#use-cases)
+- [What modified and why](#what-modified-and-why)
+- [Known issues](#known-issues)
+  - [Address format](#address-format)
+  - [Token-gating doesn't work for NFTs ("assets")](#token-gating-doesnt-work-for-nfts-assets)
+
+
 ## README for xx Network
 
 (See [KSM_README.md](./KSM_README.md) for upstream README document.)
@@ -44,6 +53,23 @@ With that, I can login (see [xx_screenshot.png](./xx_screenshot.png) and balance
 
 `npm run build` builds okay, but has warnings about multiple versions of some package, etc. I don't know JS well enough to fix this quickly.
 
+## Use cases
+
+Obviously, token-gating Web sites. But, in the context of xx Network, what kinds?
+
+- Generic infrastructure services for validators - many of whom are too cheap to pay for anything, and too lazy or privacy-conscious to register
+- Access to xx Network-related services such as Haven Space directory
+
+Because token-gating only works for *checking* the free balance, site owner can't "deduct" any money from user's wallet. 
+
+That may seem useless - at least with "NFT token-gating" they could have something to sell (NFT for site/service access), but what I think people sometimes miss is the fact that:
+
+- site owner can get paid "out of band"
+- site owner can check if the address has transferred xx coin to the site this month 
+- site owner can pre-populate form fields with wallet/address used to log in, and provide service to addresses that have already paid
+
+So this integration is not entirely useless even for sites that can't sell xx coin to their members.
+
 ## What modified and why
 
 `.env.local` and `pages/api/auth/[...nextauth].js` line 92 there's a fall back to public RPC endpoint, but I modified that one to local as well. 
@@ -87,8 +113,8 @@ The FAQs say [it's normal to see another address](https://polkadot.js.org/docs/k
 
 You can configure the wallet to default to xx Network, by the way (see the screenshot), to avoid that.
 
-### Token-gating doesn't work for NFT ("asset")
+### Token-gating doesn't work for NFTs ("assets")
 
-That would need additional development, as wallet (address) balances is different from NFT (asset) lookup where one not only looks up free balance for each NFT, but NFT names, amounts, units, and other metadata from a different Polkadot pallet.
+That would need additional development, as wallet (address) balance is completely different from NFT (in xx Network wallet: "asset") lookup where one not only has to look up the balance but check which NFTs are or aren't available, their properties, etc - and this is a completely different Polkadot pallet.
 
 I looked briefly and it seemed much more complex than wallet balance.
