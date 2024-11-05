@@ -4,7 +4,6 @@
 - [What modified and why](#what-modified-and-why)
 - [Known issues](#known-issues)
   - [Address format](#address-format)
-  - [Token-gating doesn't work for NFTs ("assets")](#token-gating-doesnt-work-for-nfts-assets)
 
 
 ## README for xx Network
@@ -20,6 +19,9 @@ What it is:
 ![Token-gated xx coin site](xx_screenshot.png)
 
 Thank you to [the original author](https://polkadot.study/tutorials/tokengated-polkadot-next-js/intro) and the guy who [forked it](https://github.com/yk909/polkadot-js-tokengated-website/) to apply some fixes (verify/compare if you plan to use in production, of course).
+
+What it is not (yet):
+- "Asset"-gating - there's no way to evaluate address balance for (xx Network) assets held. [This post](https://armchairancap.github.io/blog/2023/11/05/xx-network-asset-gated-access) has code samples that can be used to achieve that
 
 This sort of works now and I'm sharing in the hope someone will use it for xx Network or other Substrate projects/chains for which the upstream forks don't provide instructions. 
 
@@ -113,8 +115,3 @@ The FAQs say [it's normal to see another address](https://polkadot.js.org/docs/k
 
 You can configure the wallet to default to xx Network, by the way (see the screenshot), to avoid that.
 
-### Token-gating doesn't work for NFTs ("assets")
-
-That would need additional development, as wallet (address) balance is completely different from NFT (in xx Network wallet: "asset") lookup where one not only has to look up the balance but check which NFTs are or aren't available, their properties, etc - and this is a completely different Polkadot pallet.
-
-I looked briefly and it seemed much more complex than wallet balance.
