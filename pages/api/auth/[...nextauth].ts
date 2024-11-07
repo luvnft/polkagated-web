@@ -94,14 +94,35 @@ export const authOptions: NextAuthOptions = {
           const api = await ApiPromise.create({ provider: wsProvider });
           await api.isReady;
 
-          if (credentials?.address) {          
-          // AA: encode wallet address for ss58Format 55
-          const ksmAddress = encodeAddress(credentials.address, 55);
-          const accountInfo = await api.query.system.account(ksmAddress);
-          const balance = accountInfo.data.free.add(accountInfo.data.reserved);
-          // AA: write ksmAddress for xx Network to console
-          console.log('wallet address on xx Network: ', ksmAddress);
-          console.log('wallet balance on xx Network: ', balance.toString());          
+          if (credentials?.address) {
+            // AA: encode wallet address for ss58Format 55
+            const ksmAddress = encodeAddress(credentials.address, 55);
+            console.log("ksmAddress: ", ksmAddress);
+            const accountInfo = (await api.query.system.account(ksmAddress)) as any;
+            const balance = accountInfo.data.free.add(accountInfo.data.reserved);
+            // AA: write ksmAddress for xx Network to console            
+            console.log('Wallet address on xx Network: ', ksmAddress);
+            console.log('Wallet balance on xx Network: ', balance.toString());
+
+            // AA: asset balance check 
+            const assetId = 5; // Replace with your asset ID
+            const accountAssetInfo = await api.query.assets.account(assetId, ksmAddress);
+            if (accountAssetInfo.isEmpty) {
+              console.log(
+                `No balance found for asset ${assetId} and address ${ksmAddress}`
+              );
+            } else {
+                const assetBalance = (accountAssetInfo.toHuman() as { balance: string }).balance ? parseInt((accountAssetInfo.toHuman() as { balance: string }).balance) : 0;
+                console.log(
+                `Account balance for asset ${assetId} and address ${ksmAddress}:`,
+                assetBalance
+                );
+                if (assetBalance < 2) {
+                console.warn(`Warning: Account balance for asset ${assetId} is less than 2.`);
+                }
+            };
+            // end asset balance check 
+
             if (accountInfo.data.free.gt(new BN(1_000_000_000))) {
               // if the user has a free balance > 1 XX, we let them in
               return {
@@ -114,12 +135,9 @@ export const authOptions: NextAuthOptions = {
               return Promise.reject(new Error('🚫 The gate is closed for you'));
             }
             // highlight-end
-          };
+          }
 
           return Promise.reject(new Error('🚫 API Error'));
-
-
-
         } catch (e) {
           return null;
         }
