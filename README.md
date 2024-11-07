@@ -31,13 +31,13 @@ It can limit access to site or sections of site based on ownership or balance of
 - assets on xx chain, for example more than 1 QTY of asset ID 5
 - combination of criteria
 
-Screenshot of xx token-gating: 
+Screenshot of XX coin-gating: 
 
 ![Token-gated xx coin site](xx_screenshot.png)
 
 You may find more on asset-gating on xx chain [here](https://armchairancap.github.io/blog/2023/11/05/xx-network-asset-gated-access).
 
-With token-gated code added more recently (QTY 1 of asset ID 5 - see further below for more on this):
+With xx asset-gated code added more recently (QTY 1 of asset ID 5- see further below for more on this):
 
 ![xx token- and asset-gated page](xx_polkadot_asset-gated.png)
 
