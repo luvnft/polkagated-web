@@ -52,12 +52,17 @@ export default function ProtectedPage() {
     withSi: true,
     withUnit: 'XX',
   });
-
+  
+  // AA: show assetBalance  
+  const assetBalance = session?.assetBalance || '0';
+  // const sessionInfo = JSON.stringify(session, null, 2);
+  
   // If session exists, display content
   return (
     <main className={styles.protected}>
       <h1>🎉 Welcome {session.user?.name}, you passed the 🚪</h1>
-      <p>with {ksmBalance}</p>
+      <p>with {ksmBalance}.</p>
+      <p>Your asset balance is: {assetBalance }.</p>
       <p>
         You are seeing a protected route that uses a static page and a protected api route. See the
         code at <code>/pages/protected.tsx</code>

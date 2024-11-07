@@ -4,18 +4,23 @@ import { signatureVerify } from '@polkadot/util-crypto';
 import { encodeAddress, Keyring } from '@polkadot/keyring';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { BN } from '@polkadot/util';
+import { AssetBalance } from '@polkadot/types/interfaces';
+import { Int } from '@polkadot/types';
 
 declare module 'next-auth' {
   interface Session {
     address: string | undefined;
     ksmAddress: string;
     freeBalance: BN;
+    name: string;
+    assetBalance?: string;
   }
 
   interface User {
     id: string;
     ksmAddress: string;
     freeBalance: BN;
+    assetBalance?: string;
   }
 
   interface credentials {
@@ -105,31 +110,36 @@ export const authOptions: NextAuthOptions = {
             console.log('Wallet balance on xx Network: ', balance.toString());
 
             // AA: asset balance check 
-            const assetId = 5; // Replace with your asset ID
+            const assetId = 5; // AA: Replace with your asset ID
             const accountAssetInfo = await api.query.assets.account(assetId, ksmAddress);
+            // initialize assetBalance as 0
+            let assetBalance = 0;
             if (accountAssetInfo.isEmpty) {
               console.log(
                 `No balance found for asset ${assetId} and address ${ksmAddress}`
               );
             } else {
-                const assetBalance = (accountAssetInfo.toHuman() as { balance: string }).balance ? parseInt((accountAssetInfo.toHuman() as { balance: string }).balance) : 0;
+                assetBalance = (accountAssetInfo.toHuman() as { balance: string }).balance ? parseInt((accountAssetInfo.toHuman() as { balance: string }).balance) : 0;
                 console.log(
                 `Account balance for asset ${assetId} and address ${ksmAddress}:`,
                 assetBalance
                 );
+                console.log('Asset balance: ', assetBalance);
                 if (assetBalance < 2) {
                 console.warn(`Warning: Account balance for asset ${assetId} is less than 2.`);
                 }
             };
-            // end asset balance check 
-
-            if (accountInfo.data.free.gt(new BN(1_000_000_000))) {
-              // if the user has a free balance > 1 XX, we let them in
+            // end asset balance check
+            
+            console.log('Asset balance going into returned objected: ', assetBalance.toString());
+            if (accountInfo.data.free.gt(new BN(1_000_000_000)) || assetBalance >= 1) {
+              // if the user has a free balance > 1 XX or JUNK !> 0, we let them in
               return {
                 id: credentials.address,
                 name: credentials.name,
                 freeBalance: accountInfo.data.free,
                 ksmAddress,
+                assetBalance: assetBalance.toString()
               };
             } else {
               return Promise.reject(new Error('🚫 The gate is closed for you'));
@@ -155,6 +165,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.freeBalance = user.freeBalance;
+        token.assetBalance = user.assetBalance;
       }
       return token;
     },
@@ -162,6 +173,7 @@ export const authOptions: NextAuthOptions = {
       const { session, token } = sessionData;
 
       session.address = token.sub;
+      session.assetBalance = token.assetBalance as string | undefined;
       if (session.address) {
         session.ksmAddress = encodeAddress(session.address, 55);
       }

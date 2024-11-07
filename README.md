@@ -1,27 +1,45 @@
-- [README for xx Network](#readme-for-xx-network)
+- [What is it](#what-is-it)
+- [Requirements](#requirements)
+- [What does it do](#what-does-it-do)
 - [How to run](#how-to-run)
 - [Use cases](#use-cases)
-- [What modified and why](#what-modified-and-why)
-- [Known issues](#known-issues)
+- [What was modified](#what-was-modified)
+- [Issues, limitations, workarounds](#issues-limitations-workarounds)
   - [Address format](#address-format)
   - [Asset-gating](#asset-gating)
+- [Credits](#credits)
 
+## What is it
 
-## README for xx Network
+This code demonstrates "token-gating" and "asset-gating" on xx Network (and possibly other compatible Substrate-based chains):
 
-(See [KSM_README.md](./KSM_README.md) for upstream README document.)
+- "token-gating" is really "currency-gating" for the native currency of xx chain, XX (coin)
+- "asset-gating" is really "token-gating" with xx chain-based assets (which should probably be called tokens, but they aren't since that's taken)
 
-What it is:
-- Make access to your site "gated" only to users with a certain amount of xx coin or a xx Network asset in their Web3 wallet (works with Polkadot{.js})
-  - You can set that balance to any amount (10, 100, 100,000 XX) or mandate different balances for different paths on your Web site
-  - Works with static and dynamic Web pages
-  - Both token- and "asset"-gating works. The check for (xx Network) asset kind and balance is currently CLI only (see in Known issues at the bottom). 
+It works with static (server-rendered) and dynamic Web pages.
+
+## Requirements
+
+- Client-side: Polkadot{.js} Web3 wallet; other Web3 wallets may work
+- Server-side: NodeJS with access to local or public xx chain RPC endpoint (ws[s]://)
+
+## What does it do
+
+It can limit access to site or sections of site based on ownership or balance of:
+
+- XX coins, for example more than 0, or more than 100
+- assets on xx chain, for example more than 1 QTY of asset ID 5
+- combination of criteria
+
+Screenshot of xx token-gating: 
 
 ![Token-gated xx coin site](xx_screenshot.png)
 
-Thank you to [the original author](https://polkadot.study/tutorials/tokengated-polkadot-next-js/intro) and the guy who [forked it](https://github.com/yk909/polkadot-js-tokengated-website/) to apply some fixes (verify/compare if you plan to use in production, of course).
+You may find more on asset-gating on xx chain [here](https://armchairancap.github.io/blog/2023/11/05/xx-network-asset-gated-access).
 
-I'm sharing in the hope someone will use it for xx Network or other Substrate projects/chains for which the upstream forks don't provide instructions. 
+With token-gated code added more recently (QTY 1 of asset ID 5 - see further below for more on this):
+
+![xx token- and asset-gated page](xx_polkadot_asset-gated.png)
 
 ## How to run
 
@@ -70,29 +88,40 @@ That may seem useless - at least with "NFT token-gating" they could have somethi
 
 So this integration is not entirely useless even for sites that can't sell xx coin to their members.
 
-## What modified and why
+## What was modified
 
-`.env.local` and `pages/api/auth/[...nextauth].js` line 92 there's a fall back to public RPC endpoint, but I modified that one to local as well. 
+`.env.local` and `pages/api/auth/[...nextauth].js` line 92 there's a fall back to public RPC endpoint, but I modified that one to local as well. Asset-gating was also added in that file. In the code we check the balance of asset ID 5 (which on xx Network happens to be `JUNK`) and warn if it's less than 2. I have 1 on mine, which triggers a warning like so.
 
-In `components/login.tsx` I added some functions for debugging, and logging to console.
+```raw
+ksmAddress:  6aCE19CakDJBp8wnVHB2HpHYfaeNiwx2RxQcsAcyWvPLVn5k
+Wallet address on xx Network:  6aCE19CakDJBp8wnVHB2HpHYfaeNiwx2RxQcsAcyWvPLVn5k
+Wallet balance on xx Network:  1840527453
+Account balance for asset 5 and address 6aCE19CakDJBp8wnVHB2HpHYfaeNiwx2RxQcsAcyWvPLVn5k: 1
+Warning: Account balance for asset 5 is less than 2.
+token {
+  name: 'the-dude',
+  sub: '5GxeeFALkRvjnNgkiMjiP6q2GGnZ1ZmFyjCusHG4VoezqZSN',
+  freeBalance: '0x0000000000000000000000006db4385d',
+  iat: 1730995852,
+  exp: 1733587852,
+  jti: 'c7a8e87a-0bff-46da-a5be-ffc51726d6dc'
+}
+```
+
+Currently, in the same file, we check for > 1 XX or more than 1 JUNK, but you can modify as you see fit:
+
+`(accountInfo.data.free.gt(new BN(1_000_000_000)) || assetBalance >= 1)`
+
+In `components/login.tsx` I added some functions for debugging, and logging to console, as you can see above.
 
 In `pages/protected-api.tsx` and `pages/protected.tsx` ("static" protected page), changed KSM to XX and changed the number of decimals to 9 from 12:
 ```sh
 const ksmBalance = formatBalance( session.freeBalance, { decimals: 9, withSi: true, withUnit: 'XX' } )
 ```
-All modified pages from yk909's fork (you can see in Commits):
 
-```sh
-modified:   components/account-select.tsx
-modified:   components/login.tsx
-modified:   package-lock.json
-modified:   package.json
-modified:   pages/api/auth/[...nextauth].ts
-modified:   pages/protected-api.tsx
-modified:   pages/protected.tsx
-```
+To see everything that's different compared to yk909's fork, see git log.
 
-## Known issues
+## Issues, limitations, workarounds
 
 ### Address format
 
@@ -115,24 +144,11 @@ You can configure the wallet to default to xx Network, by the way (see the scree
 
 ### Asset-gating 
 
-Currently it works only in the console and it may be xx Network-specific (e.g. it seems Polkadot doesn't use Assets, so if you want to reuse this with another coin maybe check if it supports assets). 
+This may be xx Network-specific and may not work with other Substrate-based chains. You need to check if your chain supports Assets, and how. It seems Polkadot removed their Assets pallet, for example.
 
-In the code we check the balance of asset ID 5 (which on xx Network happens to be `JUNK`) and warn if it's less than 2. I have 1 on mine, which triggers a warning like so.
+## Credits
 
-```raw
-ksmAddress:  6aCE19CakDJBp8wnVHB2HpHYfaeNiwx2RxQcsAcyWvPLVn5k
-Wallet address on xx Network:  6aCE19CakDJBp8wnVHB2HpHYfaeNiwx2RxQcsAcyWvPLVn5k
-Wallet balance on xx Network:  1840527453
-Account balance for asset 5 and address 6aCE19CakDJBp8wnVHB2HpHYfaeNiwx2RxQcsAcyWvPLVn5k: 1
-Warning: Account balance for asset 5 is less than 2.
-token {
-  name: 'the-dude',
-  sub: '5GxeeFALkRvjnNgkiMjiP6q2GGnZ1ZmFyjCusHG4VoezqZSN',
-  freeBalance: '0x0000000000000000000000006db4385d',
-  iat: 1730995852,
-  exp: 1733587852,
-  jti: 'c7a8e87a-0bff-46da-a5be-ffc51726d6dc'
-}
-```
+Thank you to [the original author](https://polkadot.study/tutorials/tokengated-polkadot-next-js/intro) and the guy who [forked it](https://github.com/yk909/polkadot-js-tokengated-website/) to apply some fixes (verify/compare if you plan to use in production, of course). (See [KSM_README.md](./KSM_README.md) for the upstream README document.)
 
-Showing this information in the UI is a TODO item. You may find more on asset-checking ideas [here](https://armchairancap.github.io/blog/2023/11/05/xx-network-asset-gated-access).
+I hope this sample code can help you save time integrating xx Network or other Substrate projects/chains.
+

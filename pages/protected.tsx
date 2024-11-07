@@ -37,10 +37,13 @@ export default function Admin({ freeBalance }: { freeBalance: BN }): JSX.Element
     withSi: true,
     withUnit: 'XX',
   });
+  // AA: asset balance 
+  const assetBalance = session?.assetBalance || '0';
   return (
     <main className={styles.protected}>
       <h1>🎉 Welcome {session.user?.name}, you passed the 🚪</h1>
-      <p>with {ksmBalance}</p>
+      <p>with {ksmBalance}.</p>
+      <p>Your asset balance is: {assetBalance}.</p>
       <p>
         You are seeing a /protected route that uses Server-Side Generation at{' '}
         <code>/pages/protected.tsx</code>{' '}
