@@ -31,6 +31,19 @@ declare module 'next-auth' {
   }
 }
 
+type TokenLevels = {
+  free?: number;
+  standard?: number;
+  premium?: number;
+  id?: number;
+};
+
+export const tokenAssetConfig = {
+  // load JSON file with token asset configuration from TOKEN_ASSET_CFG variable: {"JUNK":{"standard": 1,"premium":2},"GOLD":{"free": 0, "standard": 1, "premium":2}}
+  TAConfig: new Map<string, TokenLevels>(Object.entries(JSON.parse(process.env.NEXT_PUBLIC_TOKEN_ASSET_CFG || '{}')))
+};
+
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -95,7 +108,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           // verify the account has the defined token
-          const wsProvider = new WsProvider(process.env.RPC_ENDPOINT ?? 'ws://192.168.1.3:63007');
+          const wsProvider = new WsProvider(process.env.RPC_ENDPOINT ?? 'https://xxnetwork-rpc.dwellir.com');
           const api = await ApiPromise.create({ provider: wsProvider });
           await api.isReady;
 
@@ -112,8 +125,20 @@ export const authOptions: NextAuthOptions = {
             // AA: asset balance check 
             const assetId = 5; // AA: Replace with your asset ID
             const accountAssetInfo = await api.query.assets.account(assetId, ksmAddress);
-            // initialize assetBalance as 0
+            // AA: initialize assetBalance as 0
             let assetBalance = 0;
+            // AA: get Token-Asset Config 
+            console.log('Token-asset config in [...nextauth].ts: ', tokenAssetConfig.TAConfig);
+            // AA: find nested 'id' in tokenAssetConfig.TAConfig.entries() and compare with assetID value
+            for (const [token, levels] of tokenAssetConfig.TAConfig.entries()) {
+              for (const [level, value] of Object.entries(levels)) {
+                if (value === assetId) {
+                  console.log('Token-asset config entry: ', token, level, value);
+                  console.log('Token-asset config entry found: ', token, level, value);
+                }
+              }
+            }
+
             if (accountAssetInfo.isEmpty) {
               console.log(
                 `No balance found for asset ${assetId} and address ${ksmAddress}`
@@ -131,7 +156,8 @@ export const authOptions: NextAuthOptions = {
             };
             // end asset balance check
             
-            console.log('Asset balance going into returned objected: ', assetBalance.toString());
+            console.log('Asset balance going into returned object: ', assetBalance.toString());
+            
             if (accountInfo.data.free.gt(new BN(1_000_000_000)) || assetBalance >= 1) {
               // if the user has a free balance > 1 XX or JUNK !> 0, we let them in
               return {

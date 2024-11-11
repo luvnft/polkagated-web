@@ -9,11 +9,11 @@
   --background-start-rgb: 0, 0, 0;
   --background-end-rgb: 0, 0, 0;
 
-  --polkadot-color: #e6007a;
-  --polkadot-rgb: 230, 0, 122;
-  --polkadot-purple: #8e24aa;
+  --polkadot-color: #0db9cb;
+  --polkadot-rgb: 13, 185, 203;
+  --polkadot-purple: #1976d2;
 
-  --primary-glow: radial-gradient(#e6007aaa, rgba(1, 65, 255, 0));
+  --primary-glow: radial-gradient(#ffffff, rgba(240, 240, 255, 0));
   --secondary-glow: linear-gradient(
     to bottom right,
     rgba(1, 65, 255, 0),
